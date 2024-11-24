@@ -2,11 +2,11 @@ import Image from "next/image";
 
 export default function Home() {
   return (
-    <div className="bg-black text-white min-h-screen">
+    <div className="bg-black text-white min-h-screen relative">
       {/* Верхняя панель */}
       <div className="relative flex items-center justify-between px-4 py-2 bg-black">
         {/* Левая часть */}
-        <div className="flex items-center bg-blue-900 px-4 py-2 rounded-r-lg z-10">
+        <div className="flex items-center bg-blue-900 px-4 py-2 rounded-tr-full  z-10">
           <span className="text-xs text-white">bronze 1/10</span>
           <div className="ml-2 w-12 h-1 bg-gray-400 rounded-full relative">
             <div className="absolute top-0 left-0 w-4 h-1 bg-yellow-500 rounded-full"></div>
@@ -14,7 +14,7 @@ export default function Home() {
         </div>
 
         {/* Центральная часть */}
-        <div className="flex items-center justify-center bg-gray-700 px-6 py-2 mx-[-20px] rounded-full z-20">
+        <div className="flex items-center justify-center bg-gray-700 w-[87px] h-[120px] rounded-lg z-20">
           <div className="w-8 h-8 bg-gray-400 rounded-full flex items-center justify-center">
             <svg
               xmlns="http://www.w3.org/2000/svg"
@@ -31,29 +31,81 @@ export default function Home() {
               />
             </svg>
           </div>
-          <span className="ml-2 text-white text-sm">Mitrios</span>
-          <span className="ml-2 text-gray-300 text-xs">@9999</span>
+          <div className="ml-2 flex flex-col items-center">
+            <span className="text-white text-sm">Mitrios</span>
+            <span className="text-gray-300 text-xs">@9999</span>
+          </div>
         </div>
 
         {/* Правая часть */}
-        <div className="flex items-center bg-red-900 px-4 py-2  rounded-l-lg z-10">
+        <div className="flex items-center bg-red-900 px-4 py-2 rounded-tl-full  z-10">
           <span className="text-xs text-white">75121</span>
         </div>
       </div>
 
-      {/* Центральный блок с кнопкой Play */}
-      <div className="flex flex-col items-center mt-8">
-        <div className="bg-gray-800 w-40 h-40 rounded-full flex items-center justify-center">
-          <Image
-            src="/cards.png" // Замените на ваше изображение карт
-            alt="Cards"
-            width={80}
-            height={80}
-          />
+      {/* Основной контент */}
+      <div className="flex">
+        {/* Левая панель */}
+        <div className="flex flex-col items-center mt-8 ml-4 space-y-4">
+          {/* Кнопка Invite */}
+          <div className="flex flex-col items-center space-y-2">
+            <div className="w-12 h-12 bg-gray-600 rounded-full flex items-center justify-center">
+              <svg
+                xmlns="http://www.w3.org/2000/svg"
+                fill="none"
+                viewBox="0 0 24 24"
+                strokeWidth={1.5}
+                stroke="currentColor"
+                className="w-6 h-6 text-white"
+              >
+                <path
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                  d="M15.75 15.75a4.5 4.5 0 11-7.5 0M12 12a4.5 4.5 0 100-9 4.5 4.5 0 000 9z"
+                />
+              </svg>
+            </div>
+            <button className="px-4 py-1 bg-gray-700 rounded-lg text-sm">Invite</button>
+          </div>
+
+          {/* Повторяем Invite 4 раза */}
+          {Array.from({ length: 3 }).map((_, i) => (
+            <div key={i} className="flex flex-col items-center space-y-2">
+              <div className="w-12 h-12 bg-gray-600 rounded-full flex items-center justify-center">
+                <svg
+                  xmlns="http://www.w3.org/2000/svg"
+                  fill="none"
+                  viewBox="0 0 24 24"
+                  strokeWidth={1.5}
+                  stroke="currentColor"
+                  className="w-6 h-6 text-white"
+                >
+                  <path
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                    d="M15.75 15.75a4.5 4.5 0 11-7.5 0M12 12a4.5 4.5 0 100-9 4.5 4.5 0 000 9z"
+                  />
+                </svg>
+              </div>
+              <button className="px-4 py-1 bg-gray-700 rounded-lg text-sm">Invite</button>
+            </div>
+          ))}
         </div>
-        <button className="mt-4 px-6 py-2 bg-gray-700 rounded-full text-lg">
-          Play
-        </button>
+
+        {/* Центральный блок с кнопкой Play */}
+        <div className="flex flex-col items-center mt-8 flex-1">
+          <div className="bg-gray-800 w-40 h-40 rounded-full flex items-center justify-center">
+            <Image
+              src="/cards.png" // Замените на ваше изображение карт
+              alt="Cards"
+              width={80}
+              height={80}
+            />
+          </div>
+          <button className="mt-4 px-6 py-2 bg-gray-700 rounded-full text-lg">
+            Play
+          </button>
+        </div>
       </div>
 
       {/* Секция Your Deck */}
@@ -113,4 +165,5 @@ export default function Home() {
     </div>
   );
 }
+
 
