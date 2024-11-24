@@ -43,81 +43,38 @@ export default function Home() {
         </div>
       </div>
 
-      {/* Основной контент */}
-      <div className="flex">
+      {/* Основное содержимое */}
+      <div className="px-4 py-8">
         {/* Левая панель */}
-        <div className="flex flex-col items-center mt-8 ml-4 space-y-4">
-          {/* Кнопка Invite */}
-          <div className="flex flex-col items-center space-y-2">
-            <div className="w-12 h-12 bg-gray-600 rounded-full flex items-center justify-center">
-              <svg
-                xmlns="http://www.w3.org/2000/svg"
-                fill="none"
-                viewBox="0 0 24 24"
-                strokeWidth={1.5}
-                stroke="currentColor"
-                className="w-6 h-6 text-white"
-              >
-                <path
-                  strokeLinecap="round"
-                  strokeLinejoin="round"
-                  d="M15.75 15.75a4.5 4.5 0 11-7.5 0M12 12a4.5 4.5 0 100-9 4.5 4.5 0 000 9z"
-                />
-              </svg>
+        <div className="flex flex-col items-center space-y-4 fixed left-2 top-1/4">
+          <div className="flex items-center space-x-2">
+            <div className="w-10 h-10 bg-gray-700 rounded-full flex items-center justify-center">
+              <span className="text-sm">👤</span>
             </div>
-            <button className="px-4 py-1 bg-gray-700 rounded-lg text-sm">Invite</button>
+            <button className="text-xs px-2 py-1 bg-gray-600 rounded">Invite</button>
           </div>
-
-          {/* Повторяем Invite 4 раза */}
-          {Array.from({ length: 3 }).map((_, i) => (
-            <div key={i} className="flex flex-col items-center space-y-2">
-              <div className="w-12 h-12 bg-gray-600 rounded-full flex items-center justify-center">
-                <svg
-                  xmlns="http://www.w3.org/2000/svg"
-                  fill="none"
-                  viewBox="0 0 24 24"
-                  strokeWidth={1.5}
-                  stroke="currentColor"
-                  className="w-6 h-6 text-white"
-                >
-                  <path
-                    strokeLinecap="round"
-                    strokeLinejoin="round"
-                    d="M15.75 15.75a4.5 4.5 0 11-7.5 0M12 12a4.5 4.5 0 100-9 4.5 4.5 0 000 9z"
-                  />
-                </svg>
-              </div>
-              <button className="px-4 py-1 bg-gray-700 rounded-lg text-sm">Invite</button>
+          <div className="flex items-center space-x-2">
+            <div className="w-10 h-10 bg-gray-700 rounded-full flex items-center justify-center">
+              <span className="text-sm">+</span>
             </div>
-          ))}
+            <button className="text-xs px-2 py-1 bg-gray-600 rounded">Invite</button>
+          </div>
         </div>
 
-        {/* Центральный блок с кнопкой Play */}
-        <div className="flex flex-col items-center mt-8 flex-1">
-          <div className="bg-gray-800 w-40 h-40 rounded-full flex items-center justify-center">
-            <Image
-              src="/cards.png" // Замените на ваше изображение карт
-              alt="Cards"
-              width={80}
-              height={80}
-            />
+        {/* Центральный блок */}
+        <div className="flex flex-col items-center">
+          <div className="rounded-full w-32 h-32 bg-gray-700 flex items-center justify-center mb-6">
+            <img src="/cards.png" alt="cards" className="w-20 h-20" />
           </div>
-          <button className="mt-4 px-6 py-2 bg-gray-700 rounded-full text-lg">
+          <button className="px-8 py-2 text-lg font-bold bg-gray-600 rounded-full">
             Play
           </button>
         </div>
-      </div>
 
-      {/* Секция Your Deck */}
-      <div className="mt-12 px-4">
-        <h2 className="text-lg mb-4">Your deck</h2>
-        <div className="flex justify-center">
-          <Image
-            src="/deck.png" // Замените на ваше изображение колоды
-            alt="Deck"
-            width={100}
-            height={100}
-          />
+        {/* Колода карт */}
+        <div className="mt-10 text-center">
+          <h2 className="text-lg font-semibold">Your deck</h2>
+          <img src="/deck.png" alt="deck" className="w-24 mx-auto mt-4" />
         </div>
       </div>
 
@@ -165,5 +122,4 @@ export default function Home() {
     </div>
   );
 }
-
 
