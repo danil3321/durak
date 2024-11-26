@@ -2,27 +2,20 @@ import Image from "next/image";
 
 export default function Home() {
   return (
-    <div className="bg-black text-white min-h-screen relative">
+    <div className="bg-black text-white min-h-screen flex flex-col items-center">
       {/* Верхняя панель */}
-      <div className="relative flex items-center justify-between px-4 py-2 bg-black">
+      <div className="w-full bg-gray-800 py-4 px-4 flex items-center justify-between rounded-b-[15px] border-b border-white">
         {/* Левая часть */}
-        <div className="flex items-center bg-blue-900 px-4 py-2 rounded-tr-full  z-10">
-          <span className="text-xs text-white">bronze 1/10</span>
-          <div className="ml-2 w-12 h-1 bg-gray-400 rounded-full relative">
-            <div className="absolute top-0 left-0 w-4 h-1 bg-yellow-500 rounded-full"></div>
-          </div>
-        </div>
-
-        {/* Центральная часть */}
-        <div className="flex items-center justify-center bg-gray-700 w-[87px] h-[120px] rounded-lg z-20">
-          <div className="w-8 h-8 bg-gray-400 rounded-full flex items-center justify-center">
+        <div className="flex items-center">
+          <div className="w-10 h-10 bg-gray-600 rounded-full flex items-center justify-center">
+            {/* Аватар */}
             <svg
               xmlns="http://www.w3.org/2000/svg"
               fill="none"
               viewBox="0 0 24 24"
               strokeWidth={1.5}
               stroke="currentColor"
-              className="w-6 h-6 text-black"
+              className="w-6 h-6 text-white"
             >
               <path
                 strokeLinecap="round"
@@ -31,59 +24,101 @@ export default function Home() {
               />
             </svg>
           </div>
-          <div className="ml-2 flex flex-col items-center">
-            <span className="text-white text-sm">Mitrios</span>
-            <span className="text-gray-300 text-xs">@9999</span>
+          <div className="ml-3">
+            <p className="text-sm font-semibold">Mitrios</p>
+            <p className="text-xs text-gray-400">bronze 1/10</p>
           </div>
+        </div>
+
+        {/* Средняя часть */}
+        <div className="flex items-center text-sm">
+          <span className="mr-1 text-gray-400">$</span>
+          <p>31,234</p>
         </div>
 
         {/* Правая часть */}
-        <div className="flex items-center bg-red-900 px-4 py-2 rounded-tl-full  z-10">
-          <span className="text-xs text-white">75121</span>
+        <div className="flex items-center space-x-4">
+          {/* Бонус (PNG картинка) */}
+          <div className="w-8 h-8">
+            <Image
+              src="/bonus-icon.png" // PNG файл в public
+              alt="Bonus"
+              width={32}
+              height={32}
+            />
+          </div>
+          {/* Уведомления (PNG картинка) */}
+          <div className="w-8 h-8">
+            <Image
+              src="/notifications-icon.png" // PNG файл в public
+              alt="Notifications"
+              width={32}
+              height={32}
+            />
+          </div>
         </div>
       </div>
 
-      {/* Основное содержимое */}
-      <div className="px-4 py-8">
-        {/* Левая панель */}
-        <div className="flex flex-col items-center space-y-4 fixed left-2 top-1/4">
-          <div className="flex items-center space-x-2">
-            <div className="w-10 h-10 bg-gray-700 rounded-full flex items-center justify-center">
-              <span className="text-sm">👤</span>
-            </div>
-            <button className="text-xs px-2 py-1 bg-gray-600 rounded">Invite</button>
-          </div>
-          <div className="flex items-center space-x-2">
-            <div className="w-10 h-10 bg-gray-700 rounded-full flex items-center justify-center">
-              <span className="text-sm">+</span>
-            </div>
-            <button className="text-xs px-2 py-1 bg-gray-600 rounded">Invite</button>
+      {/* Центральная часть */}
+      <div
+        className="flex-grow w-full px-4 pt-8 pb-16"
+        style={{
+          background:
+            "linear-gradient(0.00deg, rgb(255, 255, 255), rgb(0, 0, 0), rgb(34, 34, 34) 30.16%, rgb(0, 0, 0) 99.236%)",
+        }}
+      >
+        {/* Карточки */}
+        <div className="flex flex-col items-center">
+          <div className="relative">
+            <Image
+              src="/cards.png" // Изображение карт
+              alt="Cards"
+              width={200}
+              height={150}
+            />
           </div>
         </div>
 
-        {/* Центральный блок */}
-        <div className="flex flex-col items-center">
-          <div className="rounded-full w-32 h-32 bg-gray-700 flex items-center justify-center mb-6">
-            <img src="/cards.png" alt="cards" className="w-20 h-20" />
-          </div>
-          <button className="px-8 py-2 text-lg font-bold bg-gray-600 rounded-full">
-            Play
+        {/* Кнопки */}
+        <div className="flex flex-col space-y-4 mt-8 w-full">
+          <button className="w-full py-3 border border-white text-white rounded-lg text-lg hover:bg-gray-700">
+            search game
+          </button>
+          <button className="w-full py-3 border border-white text-white rounded-lg text-lg hover:bg-gray-700">
+            create game
           </button>
         </div>
 
         {/* Колода карт */}
-        <div className="mt-10 text-center">
-          <h2 className="text-lg font-semibold">Your deck</h2>
-          <img src="/deck.png" alt="deck" className="w-24 mx-auto mt-4" />
+        <div
+          className="relative w-full mt-8 rounded-lg overflow-hidden"
+          style={{
+            backgroundImage: `url('/deck-background.png')`, // Фон прямоугольника (ваша PNG)
+            backgroundSize: "cover",
+            backgroundPosition: "center",
+          }}
+        >
+          <div className="flex justify-center items-center p-6">
+            <Image
+              src="/deck.png" // Изображение колоды карт
+              alt="Deck"
+              width={100}
+              height={100}
+            />
+          </div>
+          {/* Кнопка внутри прямоугольника */}
+          <button className="absolute bottom-2 right-2 px-3 py-1 border border-white text-sm rounded-full text-white bg-transparent hover:bg-gray-700">
+            choose deck
+          </button>
         </div>
       </div>
 
       {/* Нижняя навигация */}
-      <div className="fixed bottom-0 left-0 right-0 bg-black border-t border-gray-700 py-2">
+      <div className="fixed bottom-0 left-0 right-0 bg-gray-900 py-2 border-t border-white">
         <div className="flex justify-around">
           <div className="flex flex-col items-center">
             <Image
-              src="/home-icon.png" // Иконка дома
+              src="/home-icon.png"
               alt="Home"
               width={24}
               height={24}
@@ -92,7 +127,7 @@ export default function Home() {
           </div>
           <div className="flex flex-col items-center">
             <Image
-              src="/friends-icon.png" // Иконка друзей
+              src="/friends-icon.png"
               alt="Friends"
               width={24}
               height={24}
@@ -101,7 +136,7 @@ export default function Home() {
           </div>
           <div className="flex flex-col items-center">
             <Image
-              src="/rating-icon.png" // Иконка рейтинга
+              src="/rating-icon.png"
               alt="Rating"
               width={24}
               height={24}
@@ -110,7 +145,7 @@ export default function Home() {
           </div>
           <div className="flex flex-col items-center">
             <Image
-              src="/tournaments-icon.png" // Иконка турниров
+              src="/tournaments-icon.png"
               alt="Tournaments"
               width={24}
               height={24}
@@ -122,4 +157,3 @@ export default function Home() {
     </div>
   );
 }
-
