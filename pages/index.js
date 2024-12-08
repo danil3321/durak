@@ -4,7 +4,7 @@ export default function Home() {
   return (
     <div className="bg-black text-white min-h-screen flex flex-col items-center">
       {/* Верхняя панель */}
-      <div className="w-full bg-gray-800 py-4 px-4 flex items-center justify-between rounded-b-[15px] border-b border-white">
+      <div className="w-full bg-black py-4 px-4 flex items-center justify-between rounded-b-[15px] border-b border-white">
         {/* Левая часть */}
         <div className="flex items-center">
           <div className="w-10 h-10 bg-gray-600 rounded-full flex items-center justify-center">
@@ -91,7 +91,7 @@ export default function Home() {
 
         {/* Колода карт */}
         <div
-          className="relative w-full mt-8 rounded-lg overflow-hidden"
+          className="relative w-full mt-8 rounded-lg overflow-hidden border border-white"
           style={{
             backgroundImage: `url('/deck-background.png')`, // Фон прямоугольника (ваша PNG)
             backgroundSize: "cover",
@@ -114,7 +114,7 @@ export default function Home() {
       </div>
 
       {/* Нижняя навигация */}
-      <div className="fixed bottom-0 left-0 right-0 bg-gray-900 py-2 border-t border-white">
+      <div className="fixed bottom-0 left-0 right-0 bg-black py-2 border-t border-white">
         <div className="flex justify-around">
           <div className="flex flex-col items-center">
             <Image
@@ -157,3 +157,4 @@ export default function Home() {
     </div>
   );
 }
+
