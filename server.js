@@ -3,8 +3,9 @@ const express = require('express');
 const { Telegraf } = require('telegraf');
 const next = require('next');
 
-const WEB_APP_URL = 'https://durak332.netlify.app'; // Ваш Netlify URL
+const WEB_APP_URL = 'http://176.108.253.229'; // Ваш Netlify URL
 const BOT_TOKEN = process.env.BOT_TOKEN; // Токен вашего бота
+const PORT = process.env.PORT || 3000;
 if (!BOT_TOKEN) {
   throw new Error('BOT_TOKEN is not defined in .env');
 }

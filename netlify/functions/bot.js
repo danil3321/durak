@@ -5,7 +5,7 @@ const bot = new Telegraf(process.env.BOT_TOKEN);
 // Обработчик текстовых сообщений
 bot.on('text', (ctx) => {
   // URL вашего веб-приложения
-  const webAppUrl = 'https://durak332.netlify.app';
+  const webAppUrl = 'http://176.108.253.229';
 
   // Отправляем сообщение с кнопкой WebApp
   ctx.reply('Открыть приложение:', {
