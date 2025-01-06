@@ -2,20 +2,20 @@ version: '3.9'
 
 services:
   app:
-    build: .
-    image: mitrios19/durak:latest  # Указываем имя для образа
+    build: .  # Если вы хотите пересобирать образ на сервере
+    image: mitrios19/durak:latest  # Указываем имя образа
     ports:
-      - "3000:3000" # Пробрасываем порт 3000
+      - "3000:3000"  # Пробрасываем порт 3000
     volumes:
-      - .:/usr/src/app # Монтируем текущую папку для разработки
-    restart: always # Автоматический перезапуск контейнера
+      - .:/usr/src/app  # Монтируем текущую папку для разработки
+    restart: always  # Автоматический перезапуск контейнера
 
   watchtower:
     image: containrrr/watchtower:latest
     container_name: watchtower
     volumes:
-      - /var/run/docker.sock:/var/run/docker.sock
+      - /var/run/docker.sock:/var/run/docker.sock  # Чтобы Watchtower мог взаимодействовать с Docker
     environment:
       - WATCHTOWER_WATCHTOWER=true
     restart: always
-    command: --interval 30
+    command: --interval 30  # Интервал проверки обновлений контейнеров (каждые 30 секунд)
