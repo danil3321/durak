@@ -1,7 +1,0 @@
-[functions]
-directory = "netlify/functions"
-
-[[redirects]]
-from = "/bot"
-to = "/.netlify/functions/bot"
-status = 200
