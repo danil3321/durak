@@ -8,3 +8,13 @@ services:
     volumes:
       - .:/usr/src/app # Монтируем текущую папку для разработки
     restart: always # Автоматический перезапуск контейнера
+
+  watchtower:
+    image: containrrr/watchtower:latest
+    container_name: watchtower
+    volumes:
+      - /var/run/docker.sock:/var/run/docker.sock
+    environment:
+      - WATCHTOWER_WATCHTOWER=true
+    restart: always
+    command: --interval 30
