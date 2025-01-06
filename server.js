@@ -34,7 +34,7 @@ const handle = app.getRequestHandler(); // Обработчик для Next.js
   });
 
   server.get('/nikita', (req, res) => {
-    res.send('проверка как я заебался');
+    res.send('Никита');
   });
 
   server.get('/danil', (req, res) => {
