@@ -3,6 +3,7 @@ version: '3.9'
 services:
   app:
     build: .
+    image: mitrios19/durak:latest  # Указываем имя для образа
     ports:
       - "3000:3000" # Пробрасываем порт 3000
     volumes:
