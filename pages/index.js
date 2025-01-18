@@ -1,6 +1,33 @@
+import { useRouter } from 'next/router';
 import Image from "next/image";
 
 export default function Home() {
+  const router = useRouter();
+
+  const createGame = async () => {
+    try {
+      const response = await fetch('/api/game/create', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+      });
+
+      if (!response.ok) {
+        throw new Error(`Failed to create game: ${response.statusText}`);
+      }
+
+      const { id } = await response.json();
+      router.push(`/game/${id}`);
+    } catch (error) {
+      console.error('Error creating game:', error);
+    }
+  };
+
+  const searchGame = () => {
+    router.push('/games');
+  };
+
   return (
     <div className="bg-black text-white min-h-screen flex flex-col items-center">
       {/* Верхняя панель */}
@@ -41,7 +68,7 @@ export default function Home() {
           {/* Бонус (PNG картинка) */}
           <div className="w-8 h-8">
             <Image
-              src="/bonus-icon.png" // PNG файл в public
+              src="/bonus-icon.png"
               alt="Bonus"
               width={32}
               height={32}
@@ -50,7 +77,7 @@ export default function Home() {
           {/* Уведомления (PNG картинка) */}
           <div className="w-8 h-8">
             <Image
-              src="/notifications-icon.png" // PNG файл в public
+              src="/notifications-icon.png"
               alt="Notifications"
               width={32}
               height={32}
@@ -71,7 +98,7 @@ export default function Home() {
         <div className="flex flex-col items-center">
           <div className="relative">
             <Image
-              src="/cards.png" // Изображение карт
+              src="/cards.png"
               alt="Cards"
               width={200}
               height={150}
@@ -81,10 +108,16 @@ export default function Home() {
 
         {/* Кнопки */}
         <div className="flex flex-col space-y-4 mt-8 w-full">
-          <button className="w-full py-3 border border-white text-white rounded-lg text-lg hover:bg-gray-700">
+          <button
+            className="w-full py-3 border border-white text-white rounded-lg text-lg hover:bg-gray-700"
+            onClick={searchGame}
+          >
             search game
           </button>
-          <button className="w-full py-3 border border-white text-white rounded-lg text-lg hover:bg-gray-700">
+          <button
+            className="w-full py-3 border border-white text-white rounded-lg text-lg hover:bg-gray-700"
+            onClick={createGame}
+          >
             create game
           </button>
         </div>
@@ -93,14 +126,14 @@ export default function Home() {
         <div
           className="relative w-full mt-8 rounded-lg overflow-hidden border border-white"
           style={{
-            backgroundImage: `url('/deck-background.png')`, // Фон прямоугольника (ваша PNG)
+            backgroundImage: "url('/deck-background.png')",
             backgroundSize: "cover",
             backgroundPosition: "center",
           }}
         >
           <div className="flex justify-center items-center p-6">
             <Image
-              src="/deck.png" // Изображение колоды карт
+              src="/deck.png"
               alt="Deck"
               width={100}
               height={100}
@@ -157,4 +190,3 @@ export default function Home() {
     </div>
   );
 }
-
