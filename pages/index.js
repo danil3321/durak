@@ -52,7 +52,7 @@ export default function Home() {
             </svg>
           </div>
           <div className="ml-3">
-            <p className="text-sm font-semibold">MitriosCnage</p>
+            <p className="text-sm font-semibold">MitriosCnage123</p>
             <p className="text-xs text-gray-400">bronze 1/10</p>
           </div>
         </div>
