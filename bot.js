@@ -13,10 +13,10 @@ const bot = new Telegraf(BOT_TOKEN);
 
 bot.start((ctx) => {
     console.log('Received /start command');
-    ctx.reply('Добро пожаловать! Нажмите кнопку ниже, чтобы открыть наш WebApp и узнать больше.', {
+    ctx.reply('Every card matters in the game!\n\nTurn your cards into rewards with CryptoDurak♠️', {
         reply_markup: {
             inline_keyboard: [
-                [{ text: 'Открыть WebApp', web_app: { url: WEB_APP_URL } }]
+                [{ text: 'Open CryptoDurak', web_app: { url: WEB_APP_URL } }]
             ],
         },
     }).then(() => {
