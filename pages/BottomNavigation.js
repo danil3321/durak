@@ -10,7 +10,7 @@ export default function BottomNavigation() {
   };
 
   return (
-    <div className="fixed bottom-0 left-0 right-0 bg-black py-2 border-t border-white">
+    <div className="fixed bottom-0 left-0 right-0 bg-black py-4 border-t border-white">
       <div className="flex justify-around">
         <div className="flex flex-col items-center" onClick={() => handleClick('/')}>
           <Image
