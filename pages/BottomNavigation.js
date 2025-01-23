@@ -6,8 +6,7 @@ export default function BottomNavigation() {
   const currentPath = router.pathname;
 
   const handleClick = (path) => {
-    // Пустая функция для обработки кликов
-    console.log(`Clicked on ${path}`);
+    router.push(path);
   };
 
   return (
@@ -15,34 +14,34 @@ export default function BottomNavigation() {
       <div className="flex justify-around">
         <div className="flex flex-col items-center" onClick={() => handleClick('/')}>
           <Image
-            src="/Active/Active_home.png"
+            src={currentPath === '/' ? "/Active/Active_home.png" : "/Inactive/Inactive_home.png"}
             alt="Home"
             width={24}
             height={24}
           />
           <span className={`text-xs mt-1 ${currentPath === '/' ? 'text-yellow-500' : 'text-gray-400'}`}>Home</span>
         </div>
-        <div className="flex flex-col items-center" onClick={() => handleClick('/friends')}>
+        <div className="flex flex-col items-center" onClick={() => handleClick('/')}>
           <Image
-            src="/Inactive/Inactive_rating.png"
+            src={currentPath === '/friends' ? "/Active/Active_rating.png" : "/Inactive/Inactive_rating.png"}
             alt="Rating"
             width={24}
             height={24}
           />
           <span className={`text-xs mt-1 ${currentPath === '/friends' ? 'text-yellow-500' : 'text-gray-400'}`}>Rating</span>
         </div>
-        <div className="flex flex-col items-center" onClick={() => handleClick('/rating')}>
+        <div className="flex flex-col items-center" onClick={() => handleClick('/')}>
           <Image
-            src="/Inactive/Inactive_tur.png"
+            src={currentPath === '/rating' ? "/Active/Active_tur.png" : "/Inactive/Inactive_tur.png"}
             alt="Tournaments"
             width={24}
             height={24}
           />
           <span className={`text-xs mt-1 ${currentPath === '/rating' ? 'text-yellow-500' : 'text-gray-400'}`}>Tournaments</span>
         </div>
-        <div className="flex flex-col items-center" onClick={() => handleClick('/wallet')}>
+        <div className="flex flex-col items-center" onClick={() => handleClick('/')}>
           <Image
-            src="/Inactive/Inactive_wallet.png"
+            src={currentPath === '/wallet' ? "/Active/Active_wallet.png" : "/Inactive/Inactive_wallet.png"}
             alt="Wallet"
             width={24}
             height={24}
