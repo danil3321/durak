@@ -88,7 +88,7 @@ export default function Home() {
           <div className="relative w-full max-w-xs rounded-lg overflow-hidden border border-white">
             <div className="flex justify-center items-center p-6">
               <Image
-                src="/friends.png"
+                src="/friends_icon.png"
                 alt="Friends"
                 width={100}
                 height={100}
