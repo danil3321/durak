@@ -68,26 +68,37 @@ export default function Home() {
           </button>
         </div>
 
-        {/* Колода карт */}
-        <div className="relative w-full mt-8 rounded-lg overflow-hidden border border-white">
-      <div className="flex justify-center items-center p-6">
-        <Image
-          src="/deck.png"
-          alt="Deck"
-          width={100}
-          height={100}
-        />
-      </div>
-      {/* Кнопки внутри прямоугольника */}
-      <div className="absolute bottom-2 right-2 flex space-x-5">
-        <button className="px-2 py-1 border border-white text-sm rounded-full text-white bg-transparent hover:bg-gray-700">
-          Choose deck
-        </button>
-        <button className="px-2 py-1 border border-white text-sm rounded-full text-white bg-transparent hover:bg-gray-700">
-          Friends
-        </button>
-      </div>
-    </div>
+        <div className="flex justify-center mt-8 space-x-5">
+          {/* Первый контейнер */}
+          <div className="relative w-full max-w-xs rounded-lg overflow-hidden border border-white">
+            <div className="flex justify-center items-center p-6">
+              <Image
+                src="/deck.png"
+                alt="Deck"
+                width={100}
+                height={100}
+              />
+            </div>
+            <button className="absolute bottom-2 right-2 px-3 py-1 border border-white text-sm rounded-full text-white bg-transparent hover:bg-gray-700">
+              Choose deck
+            </button>
+          </div>
+
+          {/* Второй контейнер */}
+          <div className="relative w-full max-w-xs rounded-lg overflow-hidden border border-white">
+            <div className="flex justify-center items-center p-6">
+              <Image
+                src="/friends.png"
+                alt="Friends"
+                width={100}
+                height={100}
+              />
+            </div>
+            <button className="absolute bottom-2 right-2 px-3 py-1 border border-white text-sm rounded-full text-white bg-transparent hover:bg-gray-700">
+              Friends
+            </button>
+          </div>
+        </div>
       </div>
       <BottomNavigation />
     </div>
