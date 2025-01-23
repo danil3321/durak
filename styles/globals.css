@@ -1,3 +1,14 @@
 @import "tailwindcss/base";
 @import "tailwindcss/components";
 @import "tailwindcss/utilities";
+
+/* Подключение шрифта */
+@import url('https://fonts.googleapis.com/css2?family=Quicksand:wght@300&display=swap');
+
+/* Класс для шрифта Quicksand */
+.font-quicksand {
+  font-family: 'Quicksand', serif;
+  font-optical-sizing: auto;
+  font-weight: 300;
+  font-style: normal;
+}
