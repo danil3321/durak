@@ -40,14 +40,14 @@ export default function Home() {
             "linear-gradient(0.00deg, rgb(0 0 0), rgb(0, 0, 0), rgb(34, 34, 34) 30.16%, rgb(0, 0, 0) 99.236%)",
         }}
       >
-        {/* Карточки */}
+        {/* Монета */}
         <div className="flex flex-col items-center">
           <div className="relative">
             <Image
-              src="/cards.png"
-              alt="Cards"
-              width={200}
-              height={150}
+              src="/Coin_icon.png"
+              alt="DurakCoin"
+              width={220}
+              height={220}
             />
           </div>
         </div>
