@@ -21,25 +21,25 @@ export default function BottomNavigation() {
           />
           <span className={`text-xs mt-1 ${currentPath === '/' ? 'text-yellow-500' : 'text-gray-400'}`}>Home</span>
         </div>
-        <div className="flex flex-col items-center" onClick={() => handleClick('/')}>
+        <div className="flex flex-col items-center" onClick={() => handleClick('/Rating')}>
           <Image
-            src={currentPath === '/friends' ? "/Active/Active_rating.png" : "/Inactive/Inactive_rating.png"}
+            src={currentPath === '/Rating' ? "/Active/Active_rating.png" : "/Inactive/Inactive_rating.png"}
             alt="Rating"
             width={24}
             height={24}
           />
-          <span className={`text-xs mt-1 ${currentPath === '/friends' ? 'text-yellow-500' : 'text-gray-400'}`}>Rating</span>
+          <span className={`text-xs mt-1 ${currentPath === '/Rating' ? 'text-yellow-500' : 'text-gray-400'}`}>Rating</span>
         </div>
-        <div className="flex flex-col items-center" onClick={() => handleClick('/')}>
+        <div className="flex flex-col items-center" onClick={() => handleClick('/Tournaments')}>
           <Image
-            src={currentPath === '/rating' ? "/Active/Active_tur.png" : "/Inactive/Inactive_tur.png"}
+            src={currentPath === '/Tournaments' ? "/Active/Active_tur.png" : "/Inactive/Inactive_tur.png"}
             alt="Tournaments"
             width={24}
             height={24}
           />
-          <span className={`text-xs mt-1 ${currentPath === '/rating' ? 'text-yellow-500' : 'text-gray-400'}`}>Tournaments</span>
+          <span className={`text-xs mt-1 ${currentPath === '/Tournaments' ? 'text-yellow-500' : 'text-gray-400'}`}>Tournaments</span>
         </div>
-        <div className="flex flex-col items-center" onClick={() => handleClick('/')}>
+        <div className="flex flex-col items-center" onClick={() => handleClick('/wallet')}>
           <Image
             src={currentPath === '/wallet' ? "/Active/Active_wallet.png" : "/Inactive/Inactive_wallet.png"}
             alt="Wallet"
