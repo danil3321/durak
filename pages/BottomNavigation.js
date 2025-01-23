@@ -5,10 +5,15 @@ export default function BottomNavigation() {
   const router = useRouter();
   const currentPath = router.pathname;
 
+  const handleClick = (path) => {
+    // Пустая функция для обработки кликов
+    console.log(`Clicked on ${path}`);
+  };
+
   return (
     <div className="fixed bottom-0 left-0 right-0 bg-black py-2 border-t border-white">
       <div className="flex justify-around">
-        <div className="flex flex-col items-center">
+        <div className="flex flex-col items-center" onClick={() => handleClick('/')}>
           <Image
             src="/Active/Active_home.png"
             alt="Home"
@@ -17,7 +22,7 @@ export default function BottomNavigation() {
           />
           <span className={`text-xs mt-1 ${currentPath === '/' ? 'text-yellow-500' : 'text-gray-400'}`}>Home</span>
         </div>
-        <div className="flex flex-col items-center">
+        <div className="flex flex-col items-center" onClick={() => handleClick('/friends')}>
           <Image
             src="/Inactive/Inactive_rating.png"
             alt="Rating"
@@ -26,7 +31,7 @@ export default function BottomNavigation() {
           />
           <span className={`text-xs mt-1 ${currentPath === '/friends' ? 'text-yellow-500' : 'text-gray-400'}`}>Rating</span>
         </div>
-        <div className="flex flex-col items-center">
+        <div className="flex flex-col items-center" onClick={() => handleClick('/rating')}>
           <Image
             src="/Inactive/Inactive_tur.png"
             alt="Tournaments"
@@ -35,7 +40,7 @@ export default function BottomNavigation() {
           />
           <span className={`text-xs mt-1 ${currentPath === '/rating' ? 'text-yellow-500' : 'text-gray-400'}`}>Tournaments</span>
         </div>
-        <div className="flex flex-col items-center">
+        <div className="flex flex-col items-center" onClick={() => handleClick('/wallet')}>
           <Image
             src="/Inactive/Inactive_wallet.png"
             alt="Wallet"
