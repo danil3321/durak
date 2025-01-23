@@ -37,7 +37,7 @@ export default function Home() {
         className="flex-grow w-full px-4 pt-8 pb-16"
         style={{
           background:
-            "linear-gradient(0.00deg, rgb(255, 255, 255), rgb(0, 0, 0), rgb(34, 34, 34) 30.16%, rgb(0, 0, 0) 99.236%)",
+            "linear-gradient(0.00deg, rgb(0 0 0), rgb(0, 0, 0), rgb(34, 34, 34) 30.16%, rgb(0, 0, 0) 99.236%)",
         }}
       >
         {/* Карточки */}
