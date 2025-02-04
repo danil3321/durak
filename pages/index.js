@@ -1,7 +1,35 @@
 import Image from "next/image";
+import { useEffect, useState } from "react";
+import { useRouter } from "next/router";
 
 export default function Home() {
+  const [userId, setUserId] = useState(null);
+  const router = useRouter();
+  useEffect(() => {
+    // Проверяем, есть ли уже userId в localStorage
+    let storedId = localStorage.getItem("userId");
+    if (!storedId) {
+      // Если нет, генерируем новый и сохраняем
+      storedId = Math.random().toString(36).substr(2, 9);
+      localStorage.setItem("userId", storedId);
+    }
+    setUserId(storedId);
+  }, []);
+
+  const createGame = async () => { // <-- Теперь `router` доступен
+    const res = await fetch("/api/create-game", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ playerId: userId }),
+    });
+
+    if (!res.ok) throw new Error("Ошибка при создании игры");
+    const data = await res.json();
+    router.push(`/game/${data.gameId}`); // <-- Ошибка устранена
+  };
+
   return (
+    
     <div className="bg-black text-white min-h-screen flex flex-col items-center">
       {/* Верхняя панель */}
       <div className="w-full bg-black py-4 px-4 flex items-center justify-between rounded-b-[15px] border-b border-white">
@@ -33,7 +61,9 @@ export default function Home() {
         {/* Средняя часть */}
         <div className="flex items-center text-sm">
           <span className="mr-1 text-gray-400">$</span>
-          <p>31,234</p>
+          
+          {/* Отображение userId */}
+          <p className="text-center text-gray-400">Your ID: {userId}</p>
         </div>
 
         {/* Правая часть */}
@@ -81,10 +111,10 @@ export default function Home() {
 
         {/* Кнопки */}
         <div className="flex flex-col space-y-4 mt-8 w-full">
-          <button className="w-full py-3 border border-white text-white rounded-lg text-lg hover:bg-gray-700">
+          <button className="w-full py-3 border border-white text-white rounded-lg text-lg hover:bg-gray-700" onClick={() => router.push("/games")}>
             search game
           </button>
-          <button className="w-full py-3 border border-white text-white rounded-lg text-lg hover:bg-gray-700">
+          <button className="w-full py-3 border border-white text-white rounded-lg text-lg hover:bg-gray-700" onClick={createGame}>
             create game
           </button>
         </div>
