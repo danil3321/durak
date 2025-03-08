@@ -1,42 +1,37 @@
-import Image from "next/image";
-import { useEffect, useState } from "react";
-import { useRouter } from "next/router";
+import { useRouter } from 'next/router';
+import Image from 'next/image';
 
 export default function Home() {
-  const [userId, setUserId] = useState(null);
   const router = useRouter();
-  useEffect(() => {
-    // Проверяем, есть ли уже userId в localStorage
-    let storedId = localStorage.getItem("userId");
-    if (!storedId) {
-      // Если нет, генерируем новый и сохраняем
-      storedId = Math.random().toString(36).substr(2, 9);
-      localStorage.setItem("userId", storedId);
+
+  const createGame = async () => {
+    // Генерируем новый gameId и перенаправляем пользователя на страницу игры
+    const newGameId = crypto.randomUUID();
+    router.push(`/game/${newGameId}`);
+    
+    // Альтернативно, можно вызвать API для создания игры:
+    /*
+    const response = await fetch('/api/game/create', { method: 'POST' });
+    if (response.ok) {
+      const newGame = await response.json();
+      router.push(`/game/${newGame.id}`);
+    } else {
+      console.error('Error creating game');
     }
-    setUserId(storedId);
-  }, []);
+    */
+  };
 
-  const createGame = async () => { // <-- Теперь `router` доступен
-    const res = await fetch("/api/create-game", {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ playerId: userId }),
-    });
-
-    if (!res.ok) throw new Error("Ошибка при создании игры");
-    const data = await res.json();
-    router.push(`/game/${data.gameId}`); // <-- Ошибка устранена
+  const searchGame = () => {
+    router.push('/games');
   };
 
   return (
-    
     <div className="bg-black text-white min-h-screen flex flex-col items-center">
       {/* Верхняя панель */}
       <div className="w-full bg-black py-4 px-4 flex items-center justify-between rounded-b-[15px] border-b border-white">
         {/* Левая часть */}
         <div className="flex items-center">
           <div className="w-10 h-10 bg-gray-600 rounded-full flex items-center justify-center">
-            {/* Аватар */}
             <svg
               xmlns="http://www.w3.org/2000/svg"
               fill="none"
@@ -61,30 +56,16 @@ export default function Home() {
         {/* Средняя часть */}
         <div className="flex items-center text-sm">
           <span className="mr-1 text-gray-400">$</span>
-          
-          {/* Отображение userId */}
-          <p className="text-center text-gray-400">Your ID: {userId}</p>
+          <p>31,234</p>
         </div>
 
         {/* Правая часть */}
         <div className="flex items-center space-x-4">
-          {/* Бонус (PNG картинка) */}
           <div className="w-8 h-8">
-            <Image
-              src="/bonus-icon.png" // PNG файл в public
-              alt="Bonus"
-              width={32}
-              height={32}
-            />
+            <Image src="/bonus-icon.png" alt="Bonus" width={32} height={32} />
           </div>
-          {/* Уведомления (PNG картинка) */}
           <div className="w-8 h-8">
-            <Image
-              src="/notifications-icon.png" // PNG файл в public
-              alt="Notifications"
-              width={32}
-              height={32}
-            />
+            <Image src="/notifications-icon.png" alt="Notifications" width={32} height={32} />
           </div>
         </div>
       </div>
@@ -100,21 +81,22 @@ export default function Home() {
         {/* Карточки */}
         <div className="flex flex-col items-center">
           <div className="relative">
-            <Image
-              src="/cards.png" // Изображение карт
-              alt="Cards"
-              width={200}
-              height={150}
-            />
+            <Image src="/cards.png" alt="Cards" width={200} height={150} />
           </div>
         </div>
 
         {/* Кнопки */}
         <div className="flex flex-col space-y-4 mt-8 w-full">
-          <button className="w-full py-3 border border-white text-white rounded-lg text-lg hover:bg-gray-700" onClick={() => router.push("/games")}>
+          <button
+            onClick={searchGame}
+            className="w-full py-3 border border-white text-white rounded-lg text-lg hover:bg-gray-700"
+          >
             search game
           </button>
-          <button className="w-full py-3 border border-white text-white rounded-lg text-lg hover:bg-gray-700" onClick={createGame}>
+          <button
+            onClick={createGame}
+            className="w-full py-3 border border-white text-white rounded-lg text-lg hover:bg-gray-700"
+          >
             create game
           </button>
         </div>
@@ -123,18 +105,13 @@ export default function Home() {
         <div
           className="relative w-full mt-8 rounded-lg overflow-hidden border border-white"
           style={{
-            backgroundImage: `url('/deck-background.png')`, // Фон прямоугольника (ваша PNG)
+            backgroundImage: "url('/deck-background.png')",
             backgroundSize: "cover",
             backgroundPosition: "center",
           }}
         >
           <div className="flex justify-center items-center p-6">
-            <Image
-              src="/deck.png" // Изображение колоды карт
-              alt="Deck"
-              width={100}
-              height={100}
-            />
+            <Image src="/deck.png" alt="Deck" width={100} height={100} />
           </div>
           {/* Кнопка внутри прямоугольника */}
           <button className="absolute bottom-2 right-2 px-3 py-1 border border-white text-sm rounded-full text-white bg-transparent hover:bg-gray-700">
@@ -147,39 +124,19 @@ export default function Home() {
       <div className="fixed bottom-0 left-0 right-0 bg-black py-2 border-t border-white">
         <div className="flex justify-around">
           <div className="flex flex-col items-center">
-            <Image
-              src="/home-icon.png"
-              alt="Home"
-              width={24}
-              height={24}
-            />
+            <Image src="/home-icon.png" alt="Home" width={24} height={24} />
             <span className="text-xs mt-1 text-yellow-500">home</span>
           </div>
           <div className="flex flex-col items-center">
-            <Image
-              src="/friends-icon.png"
-              alt="Friends"
-              width={24}
-              height={24}
-            />
+            <Image src="/friends-icon.png" alt="Friends" width={24} height={24} />
             <span className="text-xs mt-1 text-gray-400">friends</span>
           </div>
           <div className="flex flex-col items-center">
-            <Image
-              src="/rating-icon.png"
-              alt="Rating"
-              width={24}
-              height={24}
-            />
+            <Image src="/rating-icon.png" alt="Rating" width={24} height={24} />
             <span className="text-xs mt-1 text-gray-400">rating</span>
           </div>
           <div className="flex flex-col items-center">
-            <Image
-              src="/tournaments-icon.png"
-              alt="Tournaments"
-              width={24}
-              height={24}
-            />
+            <Image src="/tournaments-icon.png" alt="Tournaments" width={24} height={24} />
             <span className="text-xs mt-1 text-gray-400">tournaments</span>
           </div>
         </div>
@@ -187,4 +144,3 @@ export default function Home() {
     </div>
   );
 }
-
