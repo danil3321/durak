@@ -4,15 +4,22 @@ const http = require('http');
 const next = require('next');
 const { Server } = require('socket.io');
 
-// Импортируем глобальное хранилище игр из data/gameStore.js
+// Импорт глобального хранилища игр
 const { games } = require('./data/gameStore');
+// Импорт логики игры
+const {
+  processAttack,
+  processDefense,
+  initializeTurnOrder,
+  determineNextTurn,
+} = require('./lib/gameLogic');
 
 const dev = process.env.NODE_ENV !== 'production';
 const app = next({ dev });
 const handle = app.getRequestHandler();
 
 /**
- * Функция для создания колоды карт
+ * Функция для создания колоды карт.
  */
 function createDeck() {
   const suits = ['diamonds', 'hearts', 'clubs', 'spades'];
@@ -23,7 +30,6 @@ function createDeck() {
       deck.push({ suit, value });
     });
   });
-  // Перемешиваем колоду
   return deck.sort(() => Math.random() - 0.5);
 }
 
@@ -31,7 +37,7 @@ app.prepare().then(() => {
   const server = express();
   const httpServer = http.createServer(server);
 
-  // Инициализация Socket.io с явным указанием пути
+  // Инициализация Socket.io
   const io = new Server(httpServer, {
     path: '/socket.io',
     cors: { origin: '*' },
@@ -44,7 +50,7 @@ app.prepare().then(() => {
       console.log('joinGame received:', { gameId, playerId });
       socket.join(gameId);
 
-      // Если игры с таким gameId не существует, создаём её в глобальном хранилище
+      // Если игры с таким gameId не существует, создаём её
       if (!games[gameId]) {
         games[gameId] = {
           id: gameId,
@@ -57,40 +63,66 @@ app.prepare().then(() => {
         console.log(`Game ${gameId} created`);
       }
 
-      // Если игрока ещё нет в игре, добавляем его
-      const alreadyJoined = games[gameId].players.some((p) => p.id === playerId);
+      // Если игрока ещё нет, добавляем его
+      const alreadyJoined = games[gameId].players.some(p => p.id === playerId);
       if (!alreadyJoined) {
         games[gameId].players.push({ id: playerId, hand: [] });
         console.log(`Player ${playerId} added to game ${gameId}`);
       }
 
-      // Если в игре два игрока и статус "waiting", раздаем карты и меняем статус на "in-progress"
+      // Если два игрока и статус "waiting", раздаем карты и устанавливаем порядок ходов
       if (games[gameId].players.length === 2 && games[gameId].status === 'waiting') {
         const deck = games[gameId].deck;
-        games[gameId].players.forEach((player) => {
+        games[gameId].players.forEach(player => {
           player.hand = deck.splice(0, 6);
         });
         games[gameId].status = 'in-progress';
-        console.log(`Game ${gameId} is now in-progress`);
+        initializeTurnOrder(games[gameId]);
+        console.log(`Game ${gameId} is now in-progress. Attacker: ${games[gameId].attackerId}, Defender: ${games[gameId].defenderId}`);
       }
 
       console.log('Current game state:', games[gameId]);
       io.to(gameId).emit('gameState', games[gameId]);
     });
 
-    socket.on('playCard', ({ gameId, playerId, card }) => {
+    // Обработка атаки: только текущий атакующий может атаковать
+    socket.on('attackCard', ({ gameId, attackerId, card }) => {
       const game = games[gameId];
-      if (!game) return;
+      if (!game) return socket.emit('errorMessage', 'Game not found');
 
-      const player = game.players.find((p) => p.id === playerId);
-      if (!player) return;
+      if (attackerId !== game.attackerId) {
+        return socket.emit('errorMessage', 'Not your turn to attack');
+      }
 
-      player.hand = player.hand.filter(
-        (c) => !(c.suit === card.suit && c.value === card.value)
-      );
-      game.table.push({ ...card, playedBy: playerId });
+      try {
+        processAttack(game, card, attackerId);
+        console.log(`Attack: ${card.value} ${card.suit} by ${attackerId}`);
+        io.to(gameId).emit('gameState', game);
+      } catch (error) {
+        console.error('Attack error:', error.message);
+        socket.emit('errorMessage', error.message);
+      }
+    });
 
-      io.to(gameId).emit('gameState', game);
+    // Обработка защиты: только текущий защитник может отбиваться
+    socket.on('defendCard', ({ gameId, defenderId, card, trumpSuit }) => {
+      const game = games[gameId];
+      if (!game) return socket.emit('errorMessage', 'Game not found');
+
+      if (defenderId !== game.defenderId) {
+        return socket.emit('errorMessage', 'Not your turn to defend');
+      }
+
+      try {
+        processDefense(game, card, defenderId, trumpSuit);
+        console.log(`Defense: ${card.value} ${card.suit} by ${defenderId}`);
+        // Меняем очередность ходов после успешной защиты
+        determineNextTurn(game, true);
+        io.to(gameId).emit('gameState', game);
+      } catch (error) {
+        console.error('Defense error:', error.message);
+        socket.emit('errorMessage', error.message);
+      }
     });
 
     socket.on('disconnect', () => {
@@ -98,7 +130,6 @@ app.prepare().then(() => {
     });
   });
 
-  // Все остальные запросы передаем Next.js
   server.all('*', (req, res) => handle(req, res));
 
   const PORT = process.env.PORT || 3000;
