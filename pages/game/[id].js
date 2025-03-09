@@ -2,70 +2,70 @@ import { useEffect, useState } from 'react';
 import { useRouter } from 'next/router';
 import { io } from 'socket.io-client';
 
-let socket; // Глобальная переменная для сокета
+let socket;
 
 export default function GamePage() {
   const router = useRouter();
   const { id: gameId } = router.query;
   const [gameState, setGameState] = useState(null);
   const [playerId, setPlayerId] = useState(null);
-  // Для защиты: выбранная карта защитника и индекс атакующей пары, которую он хочет отбить
+  // Для защиты: выбранная карта защитника и индекс атакующей пары для защиты.
   const [selectedDefenseCard, setSelectedDefenseCard] = useState(null);
   const [selectedAttackIndex, setSelectedAttackIndex] = useState(null);
 
-  // Установка уникального идентификатора игрока
+  // Устанавливаем playerId из localStorage или генерируем новый.
   useEffect(() => {
     if (!gameId) return;
-    let storedPlayerId = localStorage.getItem('playerId');
-    if (!storedPlayerId) {
-      storedPlayerId = crypto.randomUUID();
-      localStorage.setItem('playerId', storedPlayerId);
-      console.log('Generated new playerId:', storedPlayerId);
+    let stored = localStorage.getItem('playerId');
+    if (!stored) {
+      stored = crypto.randomUUID();
+      localStorage.setItem('playerId', stored);
+      console.log('Generated new playerId:', stored);
     } else {
-      console.log('Using stored playerId:', storedPlayerId);
+      console.log('Using stored playerId:', stored);
     }
-    setPlayerId(storedPlayerId);
+    setPlayerId(stored);
   }, [gameId]);
 
-  // Подключение к Socket.io и отправка события joinGame
+  // Подключаемся к Socket.io и отправляем joinGame
   useEffect(() => {
     if (!gameId || !playerId) return;
-
     if (!socket) {
       socket = io('http://localhost:3000', { path: '/socket.io' });
       console.log('Socket created:', socket.id);
     }
-    console.log('Emitting joinGame with', { gameId, playerId });
+    console.log('Emitting joinGame with:', { gameId, playerId });
     socket.emit('joinGame', { gameId, playerId });
-
     socket.on('gameState', (updatedGame) => {
       console.log('Received gameState:', updatedGame);
       setGameState(updatedGame);
     });
-
     socket.on('errorMessage', (msg) => {
       console.error('Error:', msg);
     });
-
     return () => {
       socket.off('gameState');
       socket.off('errorMessage');
     };
   }, [gameId, playerId]);
 
-  // Если защитник уже выбрал свою карту и индекс атаки, отправляем событие defendCard
+  // Если защитник выбрал свою карту и индекс атаки, отправляем событие defendCard
   useEffect(() => {
     if (selectedDefenseCard && selectedAttackIndex !== null && gameState && gameState.defenderId === playerId) {
       const trumpSuit = gameState.trumpSuit || 'hearts';
-      console.log('Emitting defendCard with:', { gameId, defenderId: playerId, defenseCard: selectedDefenseCard, attackIndex: selectedAttackIndex, trumpSuit });
+      console.log('Emitting defendCard with:', {
+        gameId,
+        defenderId: playerId,
+        defenseCard: selectedDefenseCard,
+        attackIndex: selectedAttackIndex,
+        trumpSuit,
+      });
       socket.emit('defendCard', { gameId, defenderId: playerId, defenseCard: selectedDefenseCard, attackIndex: selectedAttackIndex, trumpSuit });
-      // Сбрасываем выбор
       setSelectedDefenseCard(null);
       setSelectedAttackIndex(null);
     }
   }, [selectedDefenseCard, selectedAttackIndex, gameState, playerId, gameId]);
 
-  // Если игра не загружена, показываем загрузку
   if (!gameState) {
     return <div className="bg-black text-white p-4">Loading game...</div>;
   }
@@ -74,31 +74,31 @@ export default function GamePage() {
   const isAttacker = gameState.attackerId === playerId;
   const isDefender = gameState.defenderId === playerId;
 
-  // Обработчик для атакующего: при клике на карту сразу отправляем событие attackCard
+  // Для атакующего: при клике на карту отправляем событие attackCard
   const handleAttackCardClick = (card) => {
     console.log('Attacker clicked card:', card);
     socket.emit('attackCard', { gameId, attackerId: playerId, card });
   };
 
-  // Обработчик для защитника: при клике на свою карту устанавливаем её как выбранную для защиты
+  // Для защитника: при клике на свою карту выбираем её как выбранную для защиты
   const handleDefenseCardClick = (card) => {
     console.log('Defender selected defense card:', card);
     setSelectedDefenseCard(card);
   };
 
-  // Обработчик для защитника: при клике на атакующую карту на столе выбираем индекс атаки, которую хотим отбить
+  // Для защитника: при клике на атакующую карту на столе выбираем индекс атаки, которую хотим отбить
   const handleAttackSelection = (index) => {
     console.log('Defender selected attack index:', index);
     setSelectedAttackIndex(index);
   };
 
-  // Обработчик для события "takeCards"
+  // Обработка события "takeCards"
   const handleTakeCards = () => {
     console.log('Defender chooses to take cards');
     socket.emit('takeCards', { gameId, defenderId: playerId });
   };
 
-  // Обработчик для события "bito"
+  // Обработка события "bito"
   const handleBito = () => {
     console.log('Attacker declares bito');
     socket.emit('bito', { gameId, attackerId: playerId });
@@ -111,6 +111,7 @@ export default function GamePage() {
       <p>Attacker: {gameState.attackerId}</p>
       <p>Defender: {gameState.defenderId}</p>
       <p>Players: {gameState.players.length}</p>
+      <p>Cards left in deck: {gameState.deck.length}</p>
 
       <h2 className="text-lg mt-4">Your Cards:</h2>
       <div className="flex space-x-2 mt-2">
@@ -124,6 +125,8 @@ export default function GamePage() {
                   handleAttackCardClick(card);
                 } else if (isDefender) {
                   handleDefenseCardClick(card);
+                } else {
+                  console.log('Not your turn');
                 }
               }}
             >
