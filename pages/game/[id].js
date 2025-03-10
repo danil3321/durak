@@ -27,7 +27,7 @@ export default function GamePage() {
     setPlayerId(stored);
   }, [gameId]);
 
-  // Подключаемся к Socket.io и отправляем joinGame
+  // Подключаемся к Socket.io и отправляем joinGame.
   useEffect(() => {
     if (!gameId || !playerId) return;
     if (!socket) {
@@ -49,7 +49,7 @@ export default function GamePage() {
     };
   }, [gameId, playerId]);
 
-  // Если защитник выбрал свою карту и индекс атаки, отправляем событие defendCard
+  // Если защитник выбрал свою карту и индекс атаки, отправляем событие defendCard.
   useEffect(() => {
     if (selectedDefenseCard && selectedAttackIndex !== null && gameState && gameState.defenderId === playerId) {
       const trumpSuit = gameState.trumpSuit || 'hearts';
@@ -74,19 +74,19 @@ export default function GamePage() {
   const isAttacker = gameState.attackerId === playerId;
   const isDefender = gameState.defenderId === playerId;
 
-  // Для атакующего: при клике на карту отправляем событие attackCard
+  // Обработчик для атакующего: при клике на карту отправляем событие attackCard.
   const handleAttackCardClick = (card) => {
     console.log('Attacker clicked card:', card);
     socket.emit('attackCard', { gameId, attackerId: playerId, card });
   };
 
-  // Для защитника: при клике на свою карту выбираем её как выбранную для защиты
+  // Обработчик для защитника: при клике на свою карту выбираем её для защиты.
   const handleDefenseCardClick = (card) => {
     console.log('Defender selected defense card:', card);
     setSelectedDefenseCard(card);
   };
 
-  // Для защитника: при клике на атакующую карту на столе выбираем индекс атаки, которую хотим отбить
+  // Обработчик для защитника: при клике на атакующую карту на столе выбираем индекс атаки, которую хотим отбить.
   const handleAttackSelection = (index) => {
     console.log('Defender selected attack index:', index);
     setSelectedAttackIndex(index);

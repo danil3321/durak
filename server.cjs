@@ -6,12 +6,13 @@ const { Server } = require('socket.io');
 
 // Импорт глобального хранилища игр (CommonJS)
 const { games } = require('./data/gameStore');
-// Импорт базовой логики игры
+// Импорт логики игры
 const {
   canBeat,
   processAttack,
   processDefense,
   initializeTurnOrder,
+  processBito,
   determineNextTurn,
 } = require('./lib/gameLogic');
 
@@ -35,16 +36,13 @@ function createDeck() {
 }
 
 /**
- * Функция для добора карт в руку игрока.
- * Для каждого игрока, если у него меньше 6 карт и в колоде ещё есть карты,
- * добавляем карты до 6.
+ * Добор карт: для каждого игрока, если в руке меньше 6 карт и в колоде ещё есть карты,
+ * добавляются карты до 6.
  */
 function refillHands(game) {
   game.players.forEach(player => {
     while (player.hand.length < 6 && game.deck.length > 0) {
-      // Берем карту с конца колоды (или с начала – по вашему выбору)
-      const drawnCard = game.deck.pop();
-      player.hand.push(drawnCard);
+      player.hand.push(game.deck.pop());
     }
   });
 }
@@ -75,7 +73,7 @@ app.prepare().then(() => {
           players: [],
           table: [], // Каждый элемент: { attack: {suit, value}, defense: {suit, value} || null, attackerId }
           status: 'waiting',
-          trumpSuit: 'hearts', // Пример; можно задавать динамически
+          trumpSuit: 'hearts', // Можно задавать динамически
         };
         console.log(`Game ${gameId} created`);
       }
@@ -97,12 +95,12 @@ app.prepare().then(() => {
         initializeTurnOrder(games[gameId]); // Устанавливает attackerId и defenderId
         console.log(`Game ${gameId} is now in-progress. Attacker: ${games[gameId].attackerId}, Defender: ${games[gameId].defenderId}`);
       }
-
       console.log('Current game state:', games[gameId]);
       io.to(gameId).emit('gameState', games[gameId]);
     });
 
-    // Обработка атаки: только текущий атакующий может атаковать
+    // Событие "attackCard": атакующий может подкидывать карту, если номинал совпадает с
+    // номиналом одной из уже сыгранных атакующих или защитных карт на столе.
     socket.on('attackCard', ({ gameId, attackerId, card }) => {
       const game = games[gameId];
       if (!game) return socket.emit('errorMessage', 'Game not found');
@@ -113,51 +111,36 @@ app.prepare().then(() => {
       const index = attacker.hand.findIndex(c => c.suit === card.suit && c.value === card.value);
       if (index === -1) return socket.emit('errorMessage', 'Card not found in hand');
 
-      // Если стол пуст, можно сыграть любую карту; иначе карта должна совпадать по номиналу с одной из атакующих карт
-      if (game.table.length > 0) {
-        const validValues = game.table.map(pair => pair.attack.value);
-        if (!validValues.includes(card.value)) {
-          return socket.emit('errorMessage', 'Attack card value must match one of the existing attack cards on table');
-        }
+      try {
+        processAttack(game, card, attackerId);
+        console.log(`Attack: ${card.value} ${card.suit} by ${attackerId}`);
+        io.to(gameId).emit('gameState', game);
+      } catch (error) {
+        console.error('Attack error:', error.message);
+        socket.emit('errorMessage', error.message);
       }
-      // Удаляем карту из руки и добавляем новую атаку
-      attacker.hand.splice(index, 1);
-      game.table.push({ attack: card, defense: null, attackerId });
-      console.log(`Attack: ${card.value} ${card.suit} by ${attackerId}`);
-      io.to(gameId).emit('gameState', game);
     });
 
-    // Обработка защиты: защитник выбирает свою карту и индекс атакующей пары, которую хочет отбить.
+    // Событие "defendCard": защитник выбирает свою карту и указывает индекс атакующей пары для защиты.
     socket.on('defendCard', ({ gameId, defenderId, defenseCard, attackIndex, trumpSuit }) => {
       const game = games[gameId];
       if (!game) return socket.emit('errorMessage', 'Game not found');
       if (defenderId !== game.defenderId) return socket.emit('errorMessage', 'Not your turn to defend');
+      if (attackIndex < 0 || attackIndex >= game.table.length) return socket.emit('errorMessage', 'Invalid attack index');
 
-      if (attackIndex < 0 || attackIndex >= game.table.length) {
-        return socket.emit('errorMessage', 'Invalid attack index');
-      }
       const attackPair = game.table[attackIndex];
-      if (attackPair.defense !== null) {
-        return socket.emit('errorMessage', 'This attack is already defended');
+      if (attackPair.defense !== null) return socket.emit('errorMessage', 'This attack is already defended');
+      try {
+        processDefense(game, defenseCard, defenderId, trumpSuit, attackIndex);
+        console.log(`Defense: ${defenseCard.value} ${defenseCard.suit} by ${defenderId} on attack index ${attackIndex}`);
+        io.to(gameId).emit('gameState', game);
+      } catch (error) {
+        console.error('Defense error:', error.message);
+        socket.emit('errorMessage', error.message);
       }
-      // Проверяем, может ли защитная карта побить атакующую
-      if (!canBeat(attackPair.attack, defenseCard, trumpSuit)) {
-        return socket.emit('errorMessage', 'Defense card cannot beat the attack card');
-      }
-      // Находим защитника и удаляем карту из руки
-      const defender = game.players.find(p => p.id === defenderId);
-      if (!defender) return socket.emit('errorMessage', 'Defender not found');
-      const index = defender.hand.findIndex(c => c.suit === defenseCard.suit && c.value === defenseCard.value);
-      if (index === -1) return socket.emit('errorMessage', 'Defense card not found in hand');
-      defender.hand.splice(index, 1);
-      // Записываем защитную карту в выбранной атакующей паре
-      attackPair.defense = defenseCard;
-      console.log(`Defense: ${defenseCard.value} ${defenseCard.suit} by ${defenderId} on attack index ${attackIndex}`);
-      io.to(gameId).emit('gameState', game);
     });
 
-    // Событие "bito": атакующий подтверждает, что все атаки отбиты.
-    // Перед сменой ролей, добираем карты до 6 для каждого игрока, затем очищаем стол и меняем роли.
+    // Событие "bito": атакующий подтверждает, что все атаки отбиты. После этого добираются карты, стол очищается, роли меняются.
     socket.on('bito', ({ gameId, attackerId }) => {
       const game = games[gameId];
       if (!game) return socket.emit('errorMessage', 'Game not found');
@@ -166,11 +149,8 @@ app.prepare().then(() => {
       const allDefended = game.table.every(pair => pair.defense !== null);
       if (!allDefended) return socket.emit('errorMessage', 'Not all attacks have been defended');
 
-      // Добор карт для каждого игрока до 6, если есть карты в колоде
       refillHands(game);
-      // Очищаем стол
       game.table = [];
-      // Меняем роли: атакующий становится защитником, защитник – атакующим
       const temp = game.attackerId;
       game.attackerId = game.defenderId;
       game.defenderId = temp;
@@ -178,8 +158,7 @@ app.prepare().then(() => {
       io.to(gameId).emit('gameState', game);
     });
 
-    // Событие "takeCards": защитник забирает все карты со стола,
-    // затем добирает карты до 6.
+    // Событие "takeCards": защитник забирает все карты со стола, затем добираются карты.
     socket.on('takeCards', ({ gameId, defenderId }) => {
       const game = games[gameId];
       if (!game) return socket.emit('errorMessage', 'Game not found');
@@ -188,7 +167,6 @@ app.prepare().then(() => {
       const defender = game.players.find(p => p.id === defenderId);
       if (!defender) return socket.emit('errorMessage', 'Defender not found');
 
-      // Собираем все карты (атакующие и защитные) со стола
       const cardsToTake = game.table.flatMap(pair => {
         let arr = [];
         if (pair.attack) arr.push(pair.attack);
@@ -198,8 +176,6 @@ app.prepare().then(() => {
       defender.hand = defender.hand.concat(cardsToTake);
       game.table = [];
       console.log(`Defender ${defenderId} took cards from table in game ${gameId}`);
-
-      // Добор карт для каждого игрока
       refillHands(game);
       io.to(gameId).emit('gameState', game);
     });
