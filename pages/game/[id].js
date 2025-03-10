@@ -9,7 +9,7 @@ export default function GamePage() {
   const { id: gameId } = router.query;
   const [gameState, setGameState] = useState(null);
   const [playerId, setPlayerId] = useState(null);
-  // Для защиты: выбранная карта защитника и индекс атакующей пары для защиты.
+  // Для защиты: выбранная карта защитника и индекс атакующей пары, которую он хочет отбить.
   const [selectedDefenseCard, setSelectedDefenseCard] = useState(null);
   const [selectedAttackIndex, setSelectedAttackIndex] = useState(null);
 
@@ -60,7 +60,13 @@ export default function GamePage() {
         attackIndex: selectedAttackIndex,
         trumpSuit,
       });
-      socket.emit('defendCard', { gameId, defenderId: playerId, defenseCard: selectedDefenseCard, attackIndex: selectedAttackIndex, trumpSuit });
+      socket.emit('defendCard', {
+        gameId,
+        defenderId: playerId,
+        defenseCard: selectedDefenseCard,
+        attackIndex: selectedAttackIndex,
+        trumpSuit,
+      });
       setSelectedDefenseCard(null);
       setSelectedAttackIndex(null);
     }
@@ -112,6 +118,9 @@ export default function GamePage() {
       <p>Defender: {gameState.defenderId}</p>
       <p>Players: {gameState.players.length}</p>
       <p>Cards left in deck: {gameState.deck.length}</p>
+      {gameState.trumpCard && (
+        <p>Trump: {gameState.trumpCard.value} {gameState.trumpCard.suit}</p>
+      )}
 
       <h2 className="text-lg mt-4">Your Cards:</h2>
       <div className="flex space-x-2 mt-2">

@@ -36,13 +36,22 @@ function createDeck() {
 }
 
 /**
- * Добор карт: для каждого игрока, если в руке меньше 6 карт и в колоде ещё есть карты,
- * добавляются карты до 6.
+ * Функция добора карт.
+ * Для каждого игрока, если у него меньше 6 карт и в колоде осталось хотя бы 1 карта,
+ * добираем карты. Если в колоде остаётся только 1 карта, то эта последняя карта (т.е. козырь)
+ * также раздаётся, и поле trumpCard обнуляется, чтобы она перестала отображаться отдельно.
  */
 function refillHands(game) {
   game.players.forEach(player => {
     while (player.hand.length < 6 && game.deck.length > 0) {
-      player.hand.push(game.deck.pop());
+      if (game.deck.length === 1) {
+        // Последняя карта – козырная; раздаем её и убираем trumpCard
+        player.hand.push(game.deck.pop());
+        game.trumpCard = null;
+      } else {
+        // Извлекаем карту из начала колоды
+        player.hand.push(game.deck.shift());
+      }
     }
   });
 }
@@ -66,16 +75,20 @@ app.prepare().then(() => {
 
       // Если игры с таким gameId не существует, создаём её
       if (!games[gameId]) {
+        let deck = createDeck(); // 36 карт
+        // Определяем козырную карту как последнюю карту колоды, но НЕ вырезаем её.
+        const trumpCard = deck[deck.length - 1];
         games[gameId] = {
           id: gameId,
           createdAt: new Date().toISOString(),
-          deck: createDeck(), // 36 карт
+          deck,           // Полная колода из 36 карт; trumpCard остается последней
+          trumpCard,      // Отдельно храним козырную карту для отображения
+          trumpSuit: trumpCard.suit,
           players: [],
-          table: [], // Каждый элемент: { attack: {suit, value}, defense: {suit, value} || null, attackerId }
-          status: 'waiting',
-          trumpSuit: 'hearts', // Можно задавать динамически
+          table: [],      // Каждый элемент: { attack: {suit, value}, defense: {suit, value} | null, attackerId }
+          status: 'waiting'
         };
-        console.log(`Game ${gameId} created`);
+        console.log(`Game ${gameId} created with trump: ${trumpCard.value} ${trumpCard.suit}`);
       }
 
       // Если игрока ещё нет, добавляем его
@@ -85,11 +98,13 @@ app.prepare().then(() => {
         console.log(`Player ${playerId} added to game ${gameId}`);
       }
 
-      // Если два игрока и игра в состоянии "waiting", раздаем карты и устанавливаем порядок ходов
+      // Если два игрока и игра в состоянии "waiting", раздаем карты.
       if (games[gameId].players.length === 2 && games[gameId].status === 'waiting') {
         const deck = games[gameId].deck;
+        // Раздаем каждому игроку по 6 карт, оставляя минимум одну карту в колоде (т.е. козырь)
         games[gameId].players.forEach(player => {
-          player.hand = deck.splice(0, 6);
+          let dealCount = Math.min(6, deck.length - 1);
+          player.hand = deck.splice(0, dealCount);
         });
         games[gameId].status = 'in-progress';
         initializeTurnOrder(games[gameId]); // Устанавливает attackerId и defenderId
@@ -99,8 +114,8 @@ app.prepare().then(() => {
       io.to(gameId).emit('gameState', games[gameId]);
     });
 
-    // Событие "attackCard": атакующий может подкидывать карту, если номинал совпадает с
-    // номиналом одной из уже сыгранных атакующих или защитных карт на столе.
+    // Событие "attackCard": атакующий может подкидывать карту, если её номинал совпадает с
+    // номиналом одной из атакующих или защитных карт на столе.
     socket.on('attackCard', ({ gameId, attackerId, card }) => {
       const game = games[gameId];
       if (!game) return socket.emit('errorMessage', 'Game not found');
@@ -121,7 +136,7 @@ app.prepare().then(() => {
       }
     });
 
-    // Событие "defendCard": защитник выбирает свою карту и указывает индекс атакующей пары для защиты.
+    // Событие "defendCard": защитник выбирает свою карту и индекс атакующей пары для защиты.
     socket.on('defendCard', ({ gameId, defenderId, defenseCard, attackIndex, trumpSuit }) => {
       const game = games[gameId];
       if (!game) return socket.emit('errorMessage', 'Game not found');
@@ -140,7 +155,8 @@ app.prepare().then(() => {
       }
     });
 
-    // Событие "bito": атакующий подтверждает, что все атаки отбиты. После этого добираются карты, стол очищается, роли меняются.
+    // Событие "bito": атакующий подтверждает, что все атаки отбиты.
+    // После этого добираются карты до 6, стол очищается, и роли меняются.
     socket.on('bito', ({ gameId, attackerId }) => {
       const game = games[gameId];
       if (!game) return socket.emit('errorMessage', 'Game not found');
