@@ -14,6 +14,7 @@ const {
   initializeTurnOrder,
   processBito,
   determineNextTurn,
+  checkGameOver, // новая функция проверки завершения игры
 } = require('./lib/gameLogic');
 
 const dev = process.env.NODE_ENV !== 'production';
@@ -171,6 +172,11 @@ app.prepare().then(() => {
       game.attackerId = game.defenderId;
       game.defenderId = temp;
       console.log(`Bito declared by attacker ${attackerId} in game ${gameId}`);
+
+      // Проверка завершения игры
+      if (checkGameOver(game)) {
+        console.log(`Game ${gameId} finished. Winner: ${game.winnerId}`);
+      }
       io.to(gameId).emit('gameState', game);
     });
 
@@ -193,6 +199,11 @@ app.prepare().then(() => {
       game.table = [];
       console.log(`Defender ${defenderId} took cards from table in game ${gameId}`);
       refillHands(game);
+
+      // Проверка завершения игры
+      if (checkGameOver(game)) {
+        console.log(`Game ${gameId} finished. Winner: ${game.winnerId}`);
+      }
       io.to(gameId).emit('gameState', game);
     });
 

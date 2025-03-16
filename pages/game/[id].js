@@ -1,6 +1,7 @@
 import { useEffect, useState } from 'react';
 import { useRouter } from 'next/router';
 import { io } from 'socket.io-client';
+import Link from 'next/link';
 
 let socket;
 
@@ -51,7 +52,12 @@ export default function GamePage() {
 
   // Если защитник выбрал свою карту и индекс атаки, отправляем событие defendCard.
   useEffect(() => {
-    if (selectedDefenseCard && selectedAttackIndex !== null && gameState && gameState.defenderId === playerId) {
+    if (
+      selectedDefenseCard &&
+      selectedAttackIndex !== null &&
+      gameState &&
+      gameState.defenderId === playerId
+    ) {
       const trumpSuit = gameState.trumpSuit || 'hearts';
       console.log('Emitting defendCard with:', {
         gameId,
@@ -74,6 +80,22 @@ export default function GamePage() {
 
   if (!gameState) {
     return <div className="bg-black text-white p-4">Loading game...</div>;
+  }
+
+  // Если игра закончена, выводим сообщение о результате и кнопку для возврата на главную
+  if (gameState.status === 'finished') {
+    return (
+      <div className="bg-black text-white min-h-screen p-4 flex flex-col items-center justify-center">
+        {gameState.winnerId === playerId ? (
+          <h1 className="text-2xl mb-4">Вы победили!</h1>
+        ) : (
+          <h1 className="text-2xl mb-4">Вы проиграли!</h1>
+        )}
+        <Link href="/" className="px-4 py-2 bg-blue-600 rounded hover:bg-blue-700">
+          Вернуться на главную
+        </Link>
+      </div>
+    );
   }
 
   const currentPlayer = gameState.players.find(p => p.id === playerId);
